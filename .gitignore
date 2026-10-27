@@ -1,0 +1,31 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+
+# EF Core
+*.mdf
+*.ldf
+
+# Node / React
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+
+# Secrets / local overrides - NEVER commit these
+appsettings.Local.json
+appsettings.*.local.json
+**/appsettings.Local.json
+.env
+.env.local
+**/.env
+**/.env.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp

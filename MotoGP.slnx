@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MotoGP.Api/MotoGP.Api.csproj" />
+    <Project Path="src/MotoGP.Contracts/MotoGP.Contracts.csproj" />
+    <Project Path="src/MotoGP.Domain/MotoGP.Domain.csproj" />
+    <Project Path="src/MotoGP.Infrastructure/MotoGP.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MotoGP.Api.Tests/MotoGP.Api.Tests.csproj" />
+  </Folder>
+</Solution>
