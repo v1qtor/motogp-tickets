@@ -1,75 +1,66 @@
-# MotoGP.Api
+# MotoGP Tickets
 
-A layered ASP.NET Core Web API for managing MotoGP teams, riders, races, and ticket
-reservations — built with EF Core, AutoMapper, and Auth0 JWT authentication.
+A full-stack MotoGP ticket reservation system: a layered ASP.NET Core Web API and a React
+frontend for browsing races and booking tickets.
+
+```
+api/      MotoGP.Api — ASP.NET Core Web API (EF Core, AutoMapper, Auth0 JWT, MSTest)
+client/   MotoGP Tickets — React (Vite) frontend consuming the API
+```
+
+See [`api/README.md`](api/README.md) and [`client/README.md`](client/README.md) for details on
+each half.
 
 ## Architecture
 
-4-layer architecture with the Repository pattern:
+**api/** is a 4-layer ASP.NET Core API with the Repository pattern:
 
 ```
-src/
-  MotoGP.Api/              # Controllers, Program.cs (composition root), AutoMapper profiles
-  MotoGP.Contracts/        # DTOs only
-  MotoGP.Domain/           # POCO entities, pagination helper, Strategy-pattern interfaces
-  MotoGP.Infrastructure/   # EF Core DbContext, Migrations, Repositories, Seeders
-tests/
-  MotoGP.Api.Tests/        # MSTest unit tests across all layers
+api/
+  src/
+    MotoGP.Api/              # Controllers, Program.cs, AutoMapper profiles
+    MotoGP.Contracts/        # DTOs only
+    MotoGP.Domain/           # POCO entities, pagination helper, Strategy-pattern interfaces
+    MotoGP.Infrastructure/   # EF Core DbContext, Migrations, Repositories, Seeders
+  tests/
+    MotoGP.Api.Tests/        # MSTest unit tests across all layers
 ```
 
-- `Api -> Contracts, Domain, Infrastructure`; `Infrastructure -> Domain`; `Contracts`/`Domain`
-  have no project references.
-- Repositories return domain entities; controllers inject the repository + `IMapper` +
-  `ILogger<TController>` and stay thin (validate → call repository → map → return).
-- Pagination/filtering/searching is handled in repository methods and surfaced via the
-  `X-Pagination` response header.
-- Strategy pattern for race duration: `IRaceDurationCalculator` swaps between
-  laps-based and distance-based calculation via DI, with no controller changes.
-- Auth0 JWT bearer authentication on write/sensitive endpoints.
+**client/** is a Vite/React app that talks to the API over Axios, with the base URL driven by
+`VITE_API_BASE_URL` so it can point at either a local or a deployed API.
 
-## Domain
+## Running both locally
 
-Teams, sponsors (with a `TeamSponsor` join entity), riders, races, countries, and ticket
-reservations, seeded with realistic sample data (190 countries, 7 teams, 6 sponsors,
-12 riders, 19 races, 20 tickets).
+1. **API** — from `api/src/MotoGP.Api`:
+   ```bash
+   dotnet run
+   ```
+   Runs on `http://localhost:5130` / `https://localhost:7138` (Swagger at `/swagger`). Uses SQL
+   Server LocalDB, migrated and seeded automatically on first run.
 
-## Endpoints
+2. **Client** — from `client/`:
+   ```bash
+   npm install
+   npm run dev
+   ```
+   Runs on `http://localhost:5177` by default and expects the API at `http://localhost:5130`
+   (see `client/.env.development`). The API's CORS policy allows this origin.
 
-| Resource | Routes |
-|---|---|
-| Teams | `GET /api/teams`, `GET /api/teams/{id}/riders`, `GET /api/teams/{id}/sponsors` |
-| Riders | `GET /api/riders` |
-| Races | `GET /api/races`, `GET /api/races/{id}` (includes calculated `duration`) |
-| Countries | `GET /api/countries?onlyWithTickets=` |
-| Tickets | `GET /api/tickets` 🔒, `GET /api/tickets/{id}`, `POST /api/tickets`, `PATCH /api/tickets/{id}` 🔒 |
-| Seed | `POST /api/seed/tickets` (dev utility, generates extra fake tickets via Bogus) |
+3. Open the client URL Vite prints, browse races, and place a ticket order.
 
-🔒 = requires a valid Auth0 JWT bearer token.
-
-## Running locally
-
-```bash
-cd src/MotoGP.Api
-dotnet run
-```
-
-- HTTP: `http://localhost:5130`
-- HTTPS: `https://localhost:7138`
-- Swagger UI: `https://localhost:7138/swagger`
-- Database: SQL Server LocalDB, created automatically from migrations on first run. If it
-  doesn't auto-apply: `dotnet ef database update` from `src/MotoGP.Api`.
-
-Auth0 `Authority`/`Audience` in `appsettings.Development.json` are placeholders — 🔒 endpoints
-return `401` until you point them at a real Auth0 tenant.
+Auth0 `Authority`/`Audience` in the API's `appsettings.Development.json` are placeholders —
+endpoints that require a JWT (the admin ticket list and marking a ticket paid) return `401`
+until pointed at a real Auth0 tenant. Placing an order is public and works end-to-end without
+any auth setup.
 
 ## Tests
 
 ```bash
+cd api
 dotnet test
 ```
 
-MSTest, covering controllers, repositories, mapping profiles, and strategies.
-
 ## Tech stack
 
-ASP.NET Core · Entity Framework Core · SQL Server · AutoMapper · Auth0 (JWT) · MSTest · Moq
+ASP.NET Core · Entity Framework Core · SQL Server · AutoMapper · Auth0 (JWT) · MSTest · Moq ·
+React · Vite · Axios

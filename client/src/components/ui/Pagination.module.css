@@ -1,0 +1,44 @@
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 1px;
+}
+
+.pagination button {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background-color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.pagination button:hover {
+    background-color: #f1f1f1;
+}
+
+/* Bootstrap's btn-success styling for the active page */
+.pagination .active button {
+    background-color: #198754 !important;
+    color: white !important;
+    border-color: #198754 !important;
+}
+
+.pagination .disabled button {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination .dots {
+    padding: 8px 12px;
+    color: #777;
+}
